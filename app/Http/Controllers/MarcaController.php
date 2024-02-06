@@ -22,7 +22,8 @@ class MarcaController extends Controller
     public function index()
     {
         //
-        return $this->marca->all();
+        $marca = $this->marca->all();
+        return response()->json($marca, 200);
     }   
 
     /**
@@ -30,9 +31,19 @@ class MarcaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $regras = [
+            'nome' => 'required|unique:marcas',
+            'imagem' => 'required'
+        ];
+        $feedback = [
+            'required' => 'O campo :attribute é obrigatório',
+            'nome.unique' => 'O nome da marca já existe'
+        ];
+
+        $request->validate($regras,$feedback);
+        
         $marca = $this->marca->create($request->all());       
-        return $marca;
+        return response()->json($marca, 201);
     }
 
     /**
@@ -42,7 +53,11 @@ class MarcaController extends Controller
     {
         //
         $marca = $this->marca->find($id);
-        return $marca;
+        if($marca === null){
+            //return ['erro' => 'Recurso pesquisado não existe.' ];
+            return response()->json(['erro' => 'Recurso pesquisado não existe.'],404);
+        }
+        return response()->json($marca,200);
     }
 
     /**
@@ -51,8 +66,12 @@ class MarcaController extends Controller
     public function update(Request $request, $id)
     {
         $marca = $this->marca->find($id);
+        if($marca === null){
+
+            return response()->json(['erro' => 'Impossível realizar a atualização. Recurso solicitado não existe.'],404);      
+        }
         $marca->update($request->all());
-        return $marca;
+        return response()->json($marca,200);
     }
 
     /**
@@ -61,7 +80,10 @@ class MarcaController extends Controller
     public function destroy($id)
     {
         $marca = $this->marca->find($id);
+        if($marca === null){
+            return response()->json(['erro' => 'Impossível realizar a exclusão. Recurso solicitado não existe.'],404);
+        }
         $marca->delete();
-        return ['msg' => 'A marca foi removida com sucesso!'];
+        return response()->json(['msg' => 'A marca foi removida com sucesso!'],200);
     }
 }
