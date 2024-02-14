@@ -22,7 +22,7 @@ class ModeloController extends Controller
     public function index()
     {
         //
-        $modelo = $this->modelo->all();
+        $modelo = $this->modelo->with('marca')->get();
         return response()->json($modelo, 200);
     }
 
@@ -57,7 +57,7 @@ class ModeloController extends Controller
     public function show($id)
     {
         //
-        $modelo = $this->modelo->find($id);
+        $modelo = $this->modelo->with('marca')->find($id);
         if($modelo === null){
             
             return response()->json(['erro' => 'Recurso pesquisado não existe.'],404);
@@ -88,30 +88,26 @@ class ModeloController extends Controller
                 }
             }
 
-            $request->validate($regrasDinamicas, $modelo->feedback());
+            $request->validate($regrasDinamicas);
 
         }else{
 
             $request->validate($modelo->rules());
         }
 
-        //remove o arquivo antigo casa um novo arquivo tenha sido enviado no request
+        $modelo->fill($request->all());
+
+
+        //remove o arquivo antigo caso um novo arquivo tenha sido enviado no request e add novo
         if($request->file('imagem')){
             Storage::disk('public')->delete($modelo->imagem);
-        }
+            $imagem = $request->file('imagem');
+            $imagem_urn = $imagem->store('imagens','public');
+            $modelo->imagem = $imagem_urn;
+        }      
 
-        $imagem = $request->file('imagem');
-        $imagem_urn = $imagem->store('imagens','public');  
+        $modelo->save();
         
-        $modelo->update([
-            'marca_id' => $request->marca_id,
-            'nome' => $request->nome,
-            'imagem' => $imagem_urn,
-            'numero_portas' => $request->numero_portas,
-            'lugares' => $request->lugares,
-            'air_bag' => $request->air_bag,
-            'abs' => $request->abs
-        ]);
         return response()->json($modelo,200);
     }
 
