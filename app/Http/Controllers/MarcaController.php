@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MarcaController extends Controller
 {
-    protected $marca; 
+    protected $marca;
 
     //injecao do model
 
@@ -16,38 +16,66 @@ class MarcaController extends Controller
     {
         $this->marca = $marca;
     }
-    
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $marca = $this->marca->with('modelos')->get();
-        return response()->json($marca, 200);
-    }   
+        $marcas = array();
+
+
+        if ($request->has('atributos_modelos')) {
+            $atributos_modelos = $request->atributos_modelos;
+            $marcas = $this->marca->with('modelos:id,' . $atributos_modelos);
+        } else {
+            $marcas = $this->marca->with('modelos');
+        }
+
+
+        if ($request->has('filtro')) {
+
+            $filtros = explode(';', $request->filtro);
+            foreach ($filtros as $key => $condicao) {
+
+                $c = explode(':', $condicao);
+                $marcas = $marcas->where($c[0], $c[1], $c[2]);
+            }
+        }
+
+        if($request->has('atributos')){
+            $atributos = $request->atributos;
+            $marcas = $marcas->selectRaw($atributos)->get();
+        }else{
+            $marcas = $marcas->get();
+        }
+
+        
+        return response()->json($marcas, 200);
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $request->validate($this->marca->rules(),$this->marca->feedback());
+        $request->validate($this->marca->rules(), $this->marca->feedback());
 
         $imagem = $request->file('imagem');
-        $imagem_urn = $imagem->store('imagens','public');        
+        $imagem_urn = $imagem->store('imagens', 'public');
 
         $marca = $this->marca->create([
             'nome' => $request->nome,
             'imagem' => $imagem_urn
-        ]);  
+        ]);
         /**
          * Ou podemos fazer:
          * $marca->nome = $request->nome;
          * $marca->imagem = $imagem_urn;
          * 
          */
-        $marca->save();     
+        $marca->save();
         return response()->json($marca, 201);
     }
 
@@ -58,11 +86,11 @@ class MarcaController extends Controller
     {
         //
         $marca = $this->marca->with('modelos')->find($id);
-        if($marca === null){
+        if ($marca === null) {
             //return ['erro' => 'Recurso pesquisado não existe.' ];
-            return response()->json(['erro' => 'Recurso pesquisado não existe.'],404);
+            return response()->json(['erro' => 'Recurso pesquisado não existe.'], 404);
         }
-        return response()->json($marca,200);
+        return response()->json($marca, 200);
     }
 
     /**
@@ -72,24 +100,23 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($id);
 
-        if($marca === null){
+        if ($marca === null) {
 
-            return response()->json(['erro' => 'Impossível realizar a atualização. Recurso solicitado não existe.'],404);      
+            return response()->json(['erro' => 'Impossível realizar a atualização. Recurso solicitado não existe.'], 404);
         }
 
-        if ($request->method() === 'PATCH' ) {
-            
+        if ($request->method() === 'PATCH') {
+
             $regrasDinamicas = array();
 
-            foreach($marca->rules() as $input => $regra){
-                if(array_key_exists($input, $request->all())){
-                    $regrasDinamicas[$input]= $regra;
+            foreach ($marca->rules() as $input => $regra) {
+                if (array_key_exists($input, $request->all())) {
+                    $regrasDinamicas[$input] = $regra;
                 }
             }
 
             $request->validate($regrasDinamicas, $marca->feedback());
-
-        }else{
+        } else {
 
             $request->validate($marca->rules(), $marca->feedback());
         }
@@ -97,16 +124,16 @@ class MarcaController extends Controller
         $marca->fill($request->all());
 
         //remove o arquivo antigo caso um novo arquivo tenha sido enviado no request e add novo
-        if($request->file('imagem')){
+        if ($request->file('imagem')) {
             Storage::disk('public')->delete($marca->imagem);
             $imagem = $request->file('imagem');
-            $imagem_urn = $imagem->store('imagens','public');       
+            $imagem_urn = $imagem->store('imagens', 'public');
             $marca->imagem = $imagem_urn;
         }
 
         $marca->save();
-        
-        return response()->json($marca,200);
+
+        return response()->json($marca, 200);
     }
 
     /**
@@ -115,13 +142,13 @@ class MarcaController extends Controller
     public function destroy($id)
     {
         $marca = $this->marca->find($id);
-        if($marca === null){
-            return response()->json(['erro' => 'Impossível realizar a exclusão. Recurso solicitado não existe.'],404);
+        if ($marca === null) {
+            return response()->json(['erro' => 'Impossível realizar a exclusão. Recurso solicitado não existe.'], 404);
         }
-        
-        Storage::disk('public')->delete($marca->imagem);      
+
+        Storage::disk('public')->delete($marca->imagem);
 
         $marca->delete();
-        return response()->json(['msg' => 'A marca foi removida com sucesso!'],200);
+        return response()->json(['msg' => 'A marca foi removida com sucesso!'], 200);
     }
 }
