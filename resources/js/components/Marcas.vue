@@ -35,7 +35,12 @@
                 <div class="card">
                     <div class="card-header">Relação de marcas</div>
                     <div class="card-body">
-                        <table-component :dados="marcas" :titulos="['id','nome','imagem']"></table-component>
+                        <table-component :dados="marcas" :titulos="{
+                            id: { titulo: 'ID', tipo: 'texto'},
+                            nome:{ titulo: 'Nome', tipo: 'texto'},
+                            imagem:{ titulo: 'Imagem', tipo: 'imagem'},
+                            created_at:{ titulo: 'Data de criação', tipo: 'data'}
+                        }"></table-component>
                     </div>
 
                     <div class="card-footer d-flex">
