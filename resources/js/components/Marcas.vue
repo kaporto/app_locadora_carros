@@ -35,7 +35,7 @@
                 <div class="card">
                     <div class="card-header">Relação de marcas</div>
                     <div class="card-body">
-                        <table-component :dados="marcas" :titulos="{
+                        <table-component :dados="marcas.data" :titulos="{
                             id: { titulo: 'ID', tipo: 'texto'},
                             nome:{ titulo: 'Nome', tipo: 'texto'},
                             imagem:{ titulo: 'Imagem', tipo: 'imagem'},
@@ -44,6 +44,11 @@
                     </div>
 
                     <div class="card-footer d-flex">
+                        <paginate-component>
+                            <li v-for="l,chaveL in marcas.links" :key="chaveL" :class="l.active ? 'page-item active' : 'page-item'" @click="paginacao(l)">
+                                <a class="page-link" v-html="l.label"></a>
+                            </li>
+                        </paginate-component>
                         <button type="button" class="btn btn-primary btn-sm ms-auto" data-bs-toggle="modal"
                             data-bs-target="#modalMarca">Adicionar</button>
                     </div>
@@ -75,7 +80,7 @@
                         <input type="file" class="form-control" id="novaImagem" aria-describedby="novaImagemHelp"
                             placeholder="Selecione uma imagem no formato PNG." @change="carregarImagem($event)">
                     </input-container-component>
-                </div>
+                </div>                
             </template>
 
             <template v-slot:rodape>
@@ -110,10 +115,19 @@
                 arquivoImagem: [],
                 transacaoStatus: '',
                 transacaoDetalhes: {},
-                marcas: []
+                marcas: {
+                    data: []
+                }
             }
         },
         methods: {
+            paginacao(l){
+                if(l.url){
+                    this.urlBase = l.url;
+                    this.carregarLista();
+                }
+
+            },
             carregarLista(){
                 let config = {
                     headers: {                       
