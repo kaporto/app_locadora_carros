@@ -35,7 +35,7 @@
                 <div class="card">
                     <div class="card-header">Relação de marcas</div>
                     <div class="card-body">
-                        <table-component :dados="marcas" :titulos="['ID','Nome','Imagem']"></table-component>
+                        <table-component :dados="marcas" :titulos="['id','nome','imagem']"></table-component>
                     </div>
 
                     <div class="card-footer d-flex">

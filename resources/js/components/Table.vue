@@ -4,16 +4,21 @@
             <thead>
                 <tr>
                     <td v-for="t, key in titulos" :key="key">
-                    <th scope="col">{{ t }}</th>
+                    <th scope="col" class="text-uppercase">{{ t }}</th>
                     </td>
                 </tr>
 
             </thead>
             <tbody>
-                <tr v-for="m in dados" :key="m.id">
-                    <th scope="row">{{ m.id }}</th>
-                    <td>{{ m.nome }}</td>
-                    <td><img :src="'/storage/' + m.imagem" width="40" height="40"></td>
+                <tr v-for="obj in dados" :key="obj.id">
+                    <template v-for="valor, chave in obj">
+                        <td v-if="titulos.includes(chave)" :key="chave">
+                            <span v-if="chave == 'imagem'">
+                                <img :src="'/storage/'+valor" width="40" height="40">
+                            </span>
+                            <span v-else>{{ valor }}</span>
+                        </td>
+                    </template>
                 </tr>
             </tbody>
         </table>
