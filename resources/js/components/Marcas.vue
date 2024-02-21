@@ -35,7 +35,7 @@
                 <div class="card">
                     <div class="card-header">Relação de marcas</div>
                     <div class="card-body">
-                        <table-component></table-component>
+                        <table-component :dados="marcas" :titulos="['ID','Nome','Imagem']"></table-component>
                     </div>
 
                     <div class="card-footer d-flex">
@@ -77,9 +77,8 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 <button type="button" class="btn btn-primary" @click="salvar()">Salvar</button>
             </template>
-
-
         </modal-component>
+        
     </div>
 </template>
 
@@ -105,10 +104,27 @@
                 nomeMarca: '',
                 arquivoImagem: [],
                 transacaoStatus: '',
-                transacaoDetalhes: {}
+                transacaoDetalhes: {},
+                marcas: []
             }
         },
         methods: {
+            carregarLista(){
+                let config = {
+                    headers: {                       
+                        'Accept': 'application/json',
+                        'Authorization': this.token
+                    }
+                }
+
+                axios.get(this.urlBase, config)
+                    .then( response => {
+                        this.marcas = response.data;                        
+                    })
+                    .catch(errors => {
+                        console.log(errors);
+                    })
+            },
             carregarImagem(e) {
                 this.arquivoImagem = e.target.files
             },
@@ -143,6 +159,9 @@
                         //console.log(errors.response.data.message)
                     })
             }
+        },
+        mounted(){
+            this.carregarLista()
         }
     }
 </script>
