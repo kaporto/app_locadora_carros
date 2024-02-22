@@ -6,7 +6,7 @@
                     <td v-for="t, key in titulos" :key="key">
                         <th scope="col">{{ t.titulo }}</th>
                     </td>
-                    <th v-if="visualizar || atualizar || remover"></th>                    
+                    <th v-if="visualizar.visivel || atualizar || remover"></th>                    
                 </tr>
 
             </thead>
@@ -20,7 +20,7 @@
                         </span>                          
                      </td>
                      <td>
-                        <button v-if="visualizar" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalMarcaVisualizar">Visualizar</button>   
+                        <button v-if="visualizar.visivel" class="btn btn-outline-info btn-sm" :data-bs-toggle="visualizar.dataToggle" :data-bs-target="visualizar.dataTarget">Visualizar</button>   
                         <button v-if="atualizar" class="btn btn-outline-primary btn-sm">Atualizar</button> 
                         <button v-if="remover" class="btn btn-outline-danger btn-sm">Remover</button>
                      </td>

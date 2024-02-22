@@ -35,7 +35,11 @@
                 <div class="card">
                     <div class="card-header">Relação de marcas</div>
                     <div class="card-body">
-                        <table-component :dados="marcas.data" :visualizar="true" :atualizar="true" :remover="true" :titulos="{
+                        <table-component :dados="marcas.data" :visualizar="{
+                            visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaVisualizar'
+                        }"
+                        :atualizar="true" :remover="true" 
+                        :titulos="{
                             id: { titulo: 'ID', tipo: 'texto' },
                             nome: { titulo: 'Nome', tipo: 'texto' },
                             imagem: { titulo: 'Imagem', tipo: 'imagem' },
