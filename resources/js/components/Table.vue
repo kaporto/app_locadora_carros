@@ -1,6 +1,5 @@
 <template>
-    <div>
-        {{ $store.state }}        
+    <div>       
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -21,7 +20,8 @@
                         </span>                          
                      </td>
                      <td>
-                        <button v-if="visualizar.visivel" class="btn btn-outline-info btn-sm" :data-bs-toggle="visualizar.dataToggle" :data-bs-target="visualizar.dataTarget">Visualizar</button>   
+                        <button v-if="visualizar.visivel" class="btn btn-outline-info btn-sm" :data-bs-toggle="visualizar.dataToggle" 
+                        :data-bs-target="visualizar.dataTarget" @click="setStore(obj)">Visualizar</button>   
                         <button v-if="atualizar" class="btn btn-outline-primary btn-sm">Atualizar</button> 
                         <button v-if="remover" class="btn btn-outline-danger btn-sm">Remover</button>
                      </td>
@@ -57,6 +57,9 @@ export default {
         }
     },
     methods: {
+        setStore(obj){
+            this.$store.state.item = obj;            
+        },
         formatDate(value) {
           const parts = value.substring(0, 10).split('-');
           return `${parts[2]}/${parts[1]}/${parts[0]}`;

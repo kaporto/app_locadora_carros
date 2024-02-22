@@ -2,13 +2,10 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <!-- Inicio card de busca-->
-                <button @click="$store.commit('increment')" class="btn btn-primary btn-sm">Teste</button>
+                <!-- Inicio card de busca-->                
                 <div class="card mb-3">                    
-                    <div class="card-header">Busca de marcas</div>
-                    {{ $store.state }}   
-                    
-                    <div class="card-body">
+                    <div class="card-header">Busca de marcas</div>                    
+                        <div class="card-body">
                         <div class="row g-3">
                             <div class="col mb-3">
                                 <input-container-component titulo="ID" id="inputId" id-help="idHelp"
@@ -106,7 +103,19 @@
         <modal-component id="modalMarcaVisualizar" titulo="Visualizar marca">
             <template v-slot:alertas></template>
             <template v-slot:conteudo>
-                Teste
+                
+                <input-container-component titulo="ID:">
+                    <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+                </input-container-component>
+                <input-container-component titulo="Nome da Marca:">
+                    <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
+                </input-container-component>
+                <input-container-component titulo="Imagem:">
+                    <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem" disabled>
+                </input-container-component>
+                <input-container-component titulo="Data de criação:">
+                    <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                </input-container-component>
             </template>
             <template v-slot:rodape>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
