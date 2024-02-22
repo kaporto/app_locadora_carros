@@ -4,8 +4,9 @@
             <thead>
                 <tr>
                     <td v-for="t, key in titulos" :key="key">
-                    <th scope="col">{{ t.titulo }}</th>
+                        <th scope="col">{{ t.titulo }}</th>
                     </td>
+                    <th v-if="visualizar || atualizar || remover"></th>                    
                 </tr>
 
             </thead>
@@ -16,9 +17,13 @@
                         <span v-if="titulos[chaveValor].tipo == 'data'">{{ formatDate(valor) }}</span>
                         <span v-if="titulos[chaveValor].tipo == 'imagem'">
                             <img :src="'/storage/'+valor" width="40" height="40">
-                        </span>                              
-                          
-                    </td>
+                        </span>                          
+                     </td>
+                     <td>
+                        <button v-if="visualizar" class="btn btn-outline-info btn-sm" data-bs-toggle="modal" data-bs-target="#modalMarcaVisualizar">Visualizar</button>   
+                        <button v-if="atualizar" class="btn btn-outline-primary btn-sm">Atualizar</button> 
+                        <button v-if="remover" class="btn btn-outline-danger btn-sm">Remover</button>
+                     </td>
                 </tr>               
             </tbody>
         </table>
@@ -29,7 +34,10 @@
 export default {
     props: [
         'dados',
-        'titulos'
+        'titulos',
+        'atualizar',
+        'visualizar',
+        'remover'
     ],    
     computed:{
         dadosFiltrados(){
