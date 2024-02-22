@@ -3,8 +3,11 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <!-- Inicio card de busca-->
-                <div class="card mb-3">
+                <button @click="$store.commit('increment')" class="btn btn-primary btn-sm">Teste</button>
+                <div class="card mb-3">                    
                     <div class="card-header">Busca de marcas</div>
+                    {{ $store.state }}   
+                    
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col mb-3">

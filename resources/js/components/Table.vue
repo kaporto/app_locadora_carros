@@ -1,5 +1,6 @@
 <template>
     <div>
+        {{ $store.state }}        
         <table class="table table-hover">
             <thead>
                 <tr>
