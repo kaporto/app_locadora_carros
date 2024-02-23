@@ -38,7 +38,9 @@
                         <table-component :dados="marcas.data" :visualizar="{
                             visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaVisualizar'
                         }"
-                        :atualizar="true" 
+                        :atualizar="{
+                            visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaAtualizar'
+                        }"
                         :remover="{
                             visivel: true, dataToggle: 'modal', dataTarget: '#modalMarcaRemover'
                         }"
@@ -60,7 +62,7 @@
                         </paginate-component>
 
                         <button type="button" class="btn btn-primary btn-sm ms-auto" data-bs-toggle="modal"
-                            data-bs-target="#modalMarca">Adicionar</button>
+                            data-bs-target="#modalMarca" @click="limpaObj()">Adicionar</button>
 
                     </div>
                 </div>
@@ -72,10 +74,10 @@
         <modal-component id="modalMarca" titulo="Adicionar marca">
 
             <template v-slot:alertas>
-                <alert-component tipo="success" :detalhes="transacaoDetalhes" titulo="Cadastro realizado com sucesso"
-                    v-if="transacaoStatus == 'adicionado'"></alert-component>
-                <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar cadastrar a marca"
-                    v-if="transacaoStatus == 'erro'"></alert-component>
+                <alert-component tipo="success" :detalhes="$store.state.transacao" titulo="Cadastro realizado com sucesso"
+                    v-if="$store.state.transacao.status == 'sucesso'"></alert-component>
+                <alert-component tipo="danger" :detalhes="$store.state.transacao" titulo="Erro ao tentar cadastrar a marca"
+                v-if="$store.state.transacao.status == 'erro'"></alert-component>
             </template>
 
             <template v-slot:conteudo>
@@ -98,7 +100,7 @@
 
             <template v-slot:rodape>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary" @click="salvar()">Salvar</button>
+                <button type="button" class="btn btn-primary" @click="salvar()" v-if="$store.state.transacao.status != 'sucesso'">Salvar</button>
             </template>
         </modal-component>
 
@@ -147,31 +149,31 @@
                 <button type="button" class="btn btn-danger" @click="remover()" v-if="$store.state.transacao.status != 'sucesso'">Remover</button>
             </template>
         </modal-component>
+        
 
-
-        <!-- Modal de inclusão de marca -->
-        <modal-component id="modalMarca" titulo="Adicionar marca">
-
+        <!-- Modal de atualização de marca -->
+        <modal-component id="modalMarcaAtualizar" titulo="Atualizar marca">
             <template v-slot:alertas>
-                <alert-component tipo="success" :detalhes="transacaoDetalhes" titulo="Cadastro realizado com sucesso"
+                <alert-component tipo="success" :detalhes="transacaoDetalhes" titulo="Atualizacao realizado com sucesso"
                     v-if="transacaoStatus == 'adicionado'"></alert-component>
-                <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar cadastrar a marca"
+                <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar atualizar a marca"
                     v-if="transacaoStatus == 'erro'"></alert-component>
             </template>
 
             <template v-slot:conteudo>
+                
                 <div class="form-group">
-                    <input-container-component titulo="Nome da marca" id="novoNome" id-help="novoNomeHelp"
+                    <input-container-component titulo="Nome da marca" id="atualizarNome" id-help="atualizarNomeHelp"
                         texto-ajuda="Informe o nome da marca.">
-                        <input type="text" class="form-control" id="novoNome" aria-describedby="novoNomeHelp"
+                        <input type="text" class="form-control" id="atualizarNome" aria-describedby="atualizarNomeHelp"
                             placeholder="Nome da marca" v-model="nomeMarca">
                     </input-container-component>
                 </div>
 
                 <div class="form-group">
-                    <input-container-component titulo="Imagem" id="novaImagem" id-help="novaImagemHelp"
+                    <input-container-component titulo="Imagem" id="atualizarImagem" id-help="atualizarImagemHelp"
                         texto-ajuda="Selecione uma imagem no formato PNG.">
-                        <input type="file" class="form-control" id="novaImagem" aria-describedby="novaImagemHelp"
+                        <input type="file" class="form-control" id="atualizarImagem" aria-describedby="atualizarImagemHelp"
                             placeholder="Selecione uma imagem no formato PNG." @change="carregarImagem($event)">
                     </input-container-component>
                 </div>
@@ -179,9 +181,9 @@
 
             <template v-slot:rodape>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary" @click="salvar()">Salvar</button>
+                <button type="button" class="btn btn-primary" @click="atualizar()">Atualizar</button>
             </template>
-        </modal-component>
+            </modal-component>
 
     </div>
 </template>
@@ -221,6 +223,14 @@ export default {
         }
     },
     methods: {
+        limpaObj(){
+            this.$store.state.transacao.status = '';
+            this.$store.state.transacao.mensagem = '';
+        },
+        atualizar(){
+            console.log(this.$store.state.item);
+
+        },
         remover(){
             let url = this.urlBase + '/' + this.$store.state.item.id           
             
@@ -315,20 +325,15 @@ export default {
             }
 
             axios.post(this.urlBase, formData, config)
-                .then(response => {
-                    this.transacaoStatus = 'adicionado'
-                    this.transacaoDetalhes = {
-                        mensagem: 'ID do registro: ' + response.data.id
-                    }
-                    console.log(response)
+                .then(response => {          
+                    this.$store.state.transacao.status = 'sucesso';
+                    this.$store.state.transacao.mensagem = 'ID do registro: ' + response.data.id;
+                    this.carregarLista();
+                   
                 })
-                .catch(errors => {
-                    this.transacaoStatus = 'erro'
-                    this.transacaoDetalhes = {
-                        mensagem: errors.response.data.message,
-                        dados: errors.response.data.errors
-                    }
-                    //console.log(errors.response.data.message)
+                .catch(errors => {                   
+                    this.$store.state.transacao.status = 'erro';
+                    this.$store.state.transacao.mensagem = errors.response.data.message
                 })
         }
     },
