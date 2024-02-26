@@ -14,7 +14,7 @@
                 <tr v-for="obj,chave in dadosFiltrados" :key="chave">                    
                     <td v-for="valor, chaveValor in obj" :key="chaveValor">
                         <span v-if="titulos[chaveValor].tipo == 'texto'">{{ valor }}</span>
-                        <span v-if="titulos[chaveValor].tipo == 'data'">{{ formatDate(valor) }}</span>
+                        <span v-if="titulos[chaveValor].tipo == 'data'">{{ $filters.formatDataTempoGlobal(valor) }}</span>
                         <span v-if="titulos[chaveValor].tipo == 'imagem'">
                             <img :src="'/storage/'+valor" width="40" height="40">
                         </span>                          

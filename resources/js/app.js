@@ -60,6 +60,27 @@ app.component('modal-component', Modal);
 app.component('alert-component', Alert);
 app.component('paginate-component', Paginate);
 
+
+app.config.globalProperties.$filters = {
+  formatDataTempoGlobal(d) {
+    
+  if(!d) return ''
+  d = d.split('T');
+  let data = d[0];
+  let tempo = d[1];
+
+  //formatando data
+  data = data.split('-');
+  data = data[2] + '/' + data[1] + '/' + data[0];
+
+  //formatando tempo
+  tempo = tempo.split('.');
+  tempo = tempo[0];
+
+  return data + ' ' + tempo;
+  }
+}
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

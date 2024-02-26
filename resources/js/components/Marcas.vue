@@ -119,7 +119,7 @@
                     <img :src="'storage/'+$store.state.item.imagem" v-if="$store.state.item.imagem" disabled>
                 </input-container-component>
                 <input-container-component titulo="Data de criação:">
-                    <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+                    <input type="text" class="form-control" :value="$filters.formatDataTempoGlobal($store.state.item.created_at)" disabled>
                 </input-container-component>
             </template>
             <template v-slot:rodape>
