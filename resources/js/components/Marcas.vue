@@ -154,10 +154,10 @@
         <!-- Modal de atualização de marca -->
         <modal-component id="modalMarcaAtualizar" titulo="Atualizar marca">
             <template v-slot:alertas>
-                <alert-component tipo="success" :detalhes="transacaoDetalhes" titulo="Atualizacao realizado com sucesso"
-                    v-if="transacaoStatus == 'adicionado'"></alert-component>
-                <alert-component tipo="danger" :detalhes="transacaoDetalhes" titulo="Erro ao tentar atualizar a marca"
-                    v-if="transacaoStatus == 'erro'"></alert-component>
+                <alert-component tipo="success" titulo="Atualização realizada com sucesso" 
+                :detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'sucesso'"></alert-component>
+                <alert-component tipo="danger" titulo="Erro na atualização" 
+                :detalhes="$store.state.transacao" v-if="$store.state.transacao.status == 'erro'"></alert-component>
             </template>
 
             <template v-slot:conteudo>
@@ -166,7 +166,7 @@
                     <input-container-component titulo="Nome da marca" id="atualizarNome" id-help="atualizarNomeHelp"
                         texto-ajuda="Informe o nome da marca.">
                         <input type="text" class="form-control" id="atualizarNome" aria-describedby="atualizarNomeHelp"
-                            placeholder="Nome da marca" v-model="nomeMarca">
+                            placeholder="Nome da marca" v-model="$store.state.item.nome">
                     </input-container-component>
                 </div>
 
@@ -181,7 +181,7 @@
 
             <template v-slot:rodape>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-primary" @click="atualizar()">Atualizar</button>
+                <button type="button" class="btn btn-primary" @click="atualizar()" v-if="$store.state.transacao.status != 'sucesso'">Atualizar</button>
             </template>
             </modal-component>
 
@@ -228,7 +228,36 @@ export default {
             this.$store.state.transacao.mensagem = '';
         },
         atualizar(){
-            console.log(this.$store.state.item);
+            let formData = new FormData();
+            formData.append('_method','PATCH');
+            formData.append('nome',this.$store.state.item.nome);
+            if(this.arquivoImagem[0]){
+                formData.append('imagem',this.arquivoImagem[0]);
+            }
+            
+
+            let config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
+                    'Authorization': this.token
+                }
+            }
+
+            let url = this.urlBase + '/' + this.$store.state.item.id;
+
+            axios.post(url, formData, config)
+                    .then(response =>{                        
+                        atualizarImagem.value = '';
+                        this.$store.state.transacao.status = 'sucesso';
+                        this.$store.state.transacao.mensagem = response.data.msg;
+                        this.carregarLista();
+                    })
+                    .catch(errors => {                        
+                        this.$store.state.transacao.status = 'erro';
+                        this.$store.state.transacao.mensagem = errors.response.data.message;
+                        this.$store.state.transacao.dados = errors.response.data.errors;
+                    })
 
         },
         remover(){
@@ -255,7 +284,8 @@ export default {
                 }).catch(errors => {
                     //console.log('Houve um erro na tentativa de remoção do registro', errors.response.erro);
                     this.$store.state.transacao.status = 'erro';
-                    this.$store.state.transacao.mensagem = errors.response.data.erro;
+                    this.$store.state.transacao.mensagem = errors.response.data.message;
+                    this.$store.state.transacao.dados = errors.response.data.errors;
                 })
                 
             
@@ -333,7 +363,8 @@ export default {
                 })
                 .catch(errors => {                   
                     this.$store.state.transacao.status = 'erro';
-                    this.$store.state.transacao.mensagem = errors.response.data.message
+                    this.$store.state.transacao.mensagem = errors.response.data.message;
+                    this.$store.state.transacao.dados = errors.response.data.errors;
                 })
         }
     },
