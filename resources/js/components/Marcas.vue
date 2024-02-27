@@ -190,20 +190,6 @@
 
 <script>
 export default {
-
-    computed: {
-        token() {
-
-            let token = document.cookie.split(';').find(indice => {
-                return indice.includes('token=')
-            })
-
-            token = token.split('=')[1]
-            token = 'Bearer ' + token
-
-            return token
-        }
-    },
     data() {
         return {
             urlBase: 'http://localhost:8000/api/v1/marca',
@@ -238,9 +224,7 @@ export default {
 
             let config = {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Accept': 'application/json',
-                    'Authorization': this.token
+                    'Content-Type': 'multipart/form-data'                    
                 }
             }
 
@@ -269,9 +253,7 @@ export default {
             
             let config = {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Accept': 'application/json',
-                    'Authorization': this.token
+                    'Content-Type': 'multipart/form-data'                    
                 }
             }
 
@@ -321,15 +303,9 @@ export default {
 
         },
         carregarLista() {
-            let url = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro;
-            let config = {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': this.token
-                }
-            }
+            let url = this.urlBase + '?' + this.urlPaginacao + this.urlFiltro;            
 
-            axios.get(url, config)
+            axios.get(url)
                 .then(response => {
                     this.marcas = response.data;
                 })
@@ -348,9 +324,7 @@ export default {
 
             let config = {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Accept': 'application/json',
-                    'Authorization': this.token
+                    'Content-Type': 'multipart/form-data'                  
                 }
             }
 

@@ -36,6 +36,17 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 // Interceptar os requests da aplicação
 axios.interceptors.request.use(
     config =>{
+
+        let token = document.cookie.split(';').find(indice => {
+            return indice.includes('token=')
+        })
+
+        token = token.split('=')[1]
+        token = 'Bearer ' + token
+
+        config.headers['Accept'] = 'application/json'
+        config.headers.Authorization = token
+
         console.log('Interceptando o resquest antes do envio', config);
         return config;
     },
@@ -47,11 +58,26 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
     response => {
-        console.log('Interceptando o resquest antes do envio', response);
+        console.log('Interceptando a resposta', response);
         return response;
     },
     error => {
         console.log('Erro na requisição', error);
+        if(error.response.status == 401 && error.response.data.message == 'Token has expired'){
+            
+            //chama o refresh
+            axios.post('http://localhost:8000/api/refresh')
+                .then(response => {
+                    console.log('Refresh feito com sucesso', response);
+                    document.cookie = 'token=' + response.data.token
+                    console.log('Token atualizado:', response.data.token);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.log('Erro na requisição', error);
+                    return Promise.reject(error);
+                })
+        }
         return Promise.reject(error);
     }
 )
